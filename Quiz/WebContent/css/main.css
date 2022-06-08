@@ -1,0 +1,22 @@
+@charset "UTF-8";
+#container{
+	width:500px;
+	margin:10px auto;
+	background:pink;
+	display:flex;
+	padding:30px;
+}
+#boxA{
+	width:313px;
+	margin-right:20px;
+}
+#boxB .imgBox{
+	border-radius:10px;
+	overflow:hidden;
+	width:200px;
+	background:white;
+	padding:18px 10px 10px;
+}
+#boxB .imgBox img{
+	width:100%;
+}
