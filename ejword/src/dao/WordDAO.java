@@ -21,18 +21,19 @@ public class WordDAO {
 
 	private void connect() throws NamingException, SQLException {
 		Context context = new InitialContext();
-		DataSource ds = (DataSource)context.lookup("java:comp/env/ejword");
+		DataSource ds = (DataSource) context.lookup("java:comp/env/ejword");
 		this.db = ds.getConnection();
 	}
+
 	private void disconnect() {
 		try {
-			if(rs!=null) {
+			if (rs != null) {
 				rs.close();
 			}
-			if(ps!=null) {
+			if (ps != null) {
 				ps.close();
 			}
-			if(db!=null) {
+			if (db != null) {
 				db.close();
 			}
 		} catch (SQLException e) {
@@ -40,82 +41,19 @@ public class WordDAO {
 		}
 	}
 
-	public List<Word> getListBySearchWord(String searchWord,String mode){
-		List<Word> list = new ArrayList<>();
-		switch(mode) {
-		case "startsWith":
-			searchWord=searchWord+"%";
-			break;
-		case "endsWith":
-			searchWord="%"+searchWord;
-			break;
-		case "contains":
-			searchWord="%"+searchWord+"%";
-			break;
-		}
-		try {
-			this.connect();
-			ps = db.prepareStatement("SELECT * FROM words WHERE title LIKE ?");
-			ps.setString(1, searchWord);
-			rs = ps.executeQuery();
-			while(rs.next()) {
-				String title = rs.getString("title");
-				String body = rs.getString("body");
-				Word w = new Word(title,body);
-				list.add(w);
-			}
-		} catch (NamingException | SQLException e) {
-			e.printStackTrace();
-		}finally {
-			this.disconnect();
-		}
-		return list;
-	}
-	//表示件数指定
-	public List<Word> getListBySearchWord(String searchWord,String mode,int limit){
-		List<Word> list = new ArrayList<>();
-		switch(mode) {
-		case "startsWith":
-			searchWord=searchWord+"%";
-			break;
-		case "endsWith":
-			searchWord="%"+searchWord;
-			break;
-		case "contains":
-			searchWord="%"+searchWord+"%";
-			break;
-		}
-		try {
-			this.connect();
-			ps = db.prepareStatement("SELECT * FROM words WHERE title LIKE ? LIMIT ?");
-			ps.setString(1, searchWord);
-			ps.setInt(2, limit);
-			rs = ps.executeQuery();
-			while(rs.next()) {
-				String title = rs.getString("title");
-				String body = rs.getString("body");
-				Word w = new Word(title,body);
-				list.add(w);
-			}
-		} catch (NamingException | SQLException e) {
-			e.printStackTrace();
-		}finally {
-			this.disconnect();
-		}
-		return list;
-	}
 	//ページ毎に取得範囲を変更
-	public List<Word> getListBySearchWord(String searchWord,String mode,int limit,int offset){
+	public List<Word> getListBySearchWord(String searchWord, String mode, int limit, int offset) {
 		List<Word> list = new ArrayList<>();
-		switch(mode) {
+		searchWord = modifySearchWord(searchWord, mode);
+		switch (mode) {
 		case "startsWith":
-			searchWord=searchWord+"%";
+			searchWord = searchWord + "%";
 			break;
 		case "endsWith":
-			searchWord="%"+searchWord;
+			searchWord = "%" + searchWord;
 			break;
 		case "contains":
-			searchWord="%"+searchWord+"%";
+			searchWord = "%" + searchWord + "%";
 			break;
 		}
 		try {
@@ -125,23 +63,24 @@ public class WordDAO {
 			ps.setInt(2, limit);
 			ps.setInt(3, offset);
 			rs = ps.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				String title = rs.getString("title");
 				String body = rs.getString("body");
-				Word w = new Word(title,body);
+				Word w = new Word(title, body);
 				list.add(w);
 			}
 		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			this.disconnect();
 		}
 		return list;
 	}
 
 	//一致件数を求めるメソッド
-	public int getCount(String searchWord,String mode) {
-		switch(mode) {
+	public int getCount(String searchWord, String mode) {
+		searchWord = modifySearchWord(searchWord, mode);
+		switch (mode) {
 		case "startsWith":
 			searchWord = searchWord + "%";
 			break;
@@ -159,14 +98,28 @@ public class WordDAO {
 			ps = db.prepareStatement("SELECT count(*) AS total FROM words WHERE title LIKE ?");
 			ps.setString(1, searchWord);
 			rs = ps.executeQuery();
-			if(rs.next()) {
+			if (rs.next()) {
 				total = rs.getInt("total");
 			}
 		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			this.disconnect();
 		}
 		return total;
+	}
+
+	private String modifySearchWord(String searchWord, String mode) {
+		switch (mode) {
+		case "startsWith":
+			searchWord = searchWord + "%";
+			break;
+		case "contains":
+			searchWord = "%" + searchWord + "%";
+			break;
+		case "endsWith":
+			searchWord = "%" + searchWord;
+		}
+		return searchWord;
 	}
 }

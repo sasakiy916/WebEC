@@ -22,7 +22,7 @@ public class CreateDB {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://localhost:3306/ejword?useUnicode=true&characterEncoding=utf8";
 			String user = "root";
-			String pass = "root";
+			String pass = "";
 			Connection db = DriverManager.getConnection(url,user,pass);
 
 			//トランザクション処理開始
