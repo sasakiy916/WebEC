@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="java.util.*,model.*"%>
-<%
-List<Donut> list = (List<Donut>)request.getAttribute("list");
-String msg = (String)request.getAttribute("msg");
-%>
+    pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,11 +26,10 @@ table.table{
 <body>
 <div class="container">
 <a href="/donutshop/Main" class="btn btn-outline-info btn-sm float-right">公開ページを見る</a>
-<% if(msg != null){ %>
-<div class="alert alert-success" role="alert">
-<%=msg %>
-</div>
-<% } %>
+<c:if test="not empty msg">
+	<div class="alert alert-success" role="alert">
+	</div>
+</c:if>
 <form class="mt-3" action="/donutshop/Admin" method="post" enctype="multipart/form-data">
 <div class="form-group">
 <label for="name">商品名:</label>
@@ -50,22 +46,22 @@ table.table{
 <button type="submit" class="btn btn-primary">登録</button>
 </form>
 
-<% if(list != null && list.size() > 0){ %>
+<c:if test="${ not empty list }">
 <table class="table table-bordered mt-5">
-<% for(Donut d : list){%>
+<c:forEach var="d" items="${list }">
 <tr>
-<td><img src="/donutshop/upload/<%=d.getImgname() %>"></td>
-<td><%=d.getId() %></td>
-<td><%=d.getName() %></td>
-<td><%=d.getPrice() %></td>
-<td><a href="/donutshop/Admin/Update?id=<%=d.getId()%>">更新</a></td>
+<td><img src="/donutshop/upload/${d.imgname}"></td>
+<td>${d.id}</td>
+<td>${d.name}</td>
+<td>${d.price}</td>
+<td><a href="/donutshop/Admin/Update?id=${d.id}">更新</a></td>
 <td>
-<a href="/donutshop/Admin/Delete?id=<%=d.getId()%>" onclick="return confirm('削除してよろしいですか？')">削除</a>
+<a href="/donutshop/Admin/Delete?id=${d.id}" onclick="return confirm('削除してよろしいですか？')">削除</a>
 </td>
 </tr>
-<% } %>
+</c:forEach>
 </table>
-<% } %>
+</c:if>
 </div>
 </body>
 </html>
